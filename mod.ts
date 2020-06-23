@@ -35,7 +35,9 @@ export class Coffee {
   configs: Configs = {};
 
   load(): void {
-    const rawConfigs = this.runtimeAPI.readFile(this.defaultConfigPath + '/default.json');
+    const rawConfigs = this.runtimeAPI.readFile(
+      this.defaultConfigPath + "/default.json",
+    );
     this.configs = this.parsers.JSON(rawConfigs);
     this.isLoaded = true;
   }
