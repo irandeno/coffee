@@ -1,5 +1,7 @@
-import coffee from "../../Coffee.ts";
+import { Coffee } from "../../mod.ts";
 import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+
+const coffee = new Coffee
 
 const mockConfigs = {
   a: {

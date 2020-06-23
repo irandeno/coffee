@@ -1,6 +1,4 @@
-import { RuntimeAPI } from "./src/RuntimeAPI/RuntimeAPI.abstract.ts";
-import { DenoAPI } from "./src/RuntimeAPI/Deno.ts";
-import ValidateableValue from "./src/ValidateableValue.ts";
+import Validateable from "./src/Validateable.ts";
 import lensProp from "./src/lensProp.ts";
 
 interface Configs {
@@ -10,8 +8,23 @@ interface Configs {
 interface Parser {
   (raw: string): Configs;
 }
+
+interface RuntimeAPI {
+  getEnvVars(): Configs;
+  readFile(path: string): string;
+}
+
+class DenoAPI implements RuntimeAPI {
+  getEnvVars() {
+    return Deno.env.toObject();
+  }
+  readFile(path: string) {
+    return Deno.readTextFileSync(path);
+  }
+}
+
 export class Coffee {
-  defaultConfigPath = "./config/default.json";
+  defaultConfigPath = "./config";
   runtimeAPI: RuntimeAPI = new DenoAPI();
   private isLoaded = false;
 
@@ -22,15 +35,15 @@ export class Coffee {
   configs: Configs = {};
 
   load(): void {
-    const rawConfigs = this.runtimeAPI.readFile(this.defaultConfigPath);
+    const rawConfigs = this.runtimeAPI.readFile(this.defaultConfigPath + '/default.json');
     this.configs = this.parsers.JSON(rawConfigs);
     this.isLoaded = true;
   }
 
-  get(path: string): ValidateableValue {
+  get(path: string): Validateable {
     if (this.isLoaded === false) this.load();
     const v = lensProp(this.configs, path);
-    return new ValidateableValue(v);
+    return new Validateable(v);
   }
 }
 

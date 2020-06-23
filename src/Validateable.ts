@@ -1,4 +1,4 @@
-export default class ValidateableValue {
+export default class Validateable {
   value: unknown;
   constructor(v: unknown) {
     this.value = v;
