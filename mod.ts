@@ -1,62 +1,51 @@
-class Coffee {
-  private config: object = {};
-  private currentLocation: string = "";
-  async load(filename?: string | URL) {
-    let configContent;
-    if (filename) {
-      configContent = await Deno.readTextFile(filename);
-    } else {
-      configContent = await this.getDefaultConfig();
-    }
-    this.config = this.parse(configContent);
+import Validateable from "./src/Validateable.ts";
+import lensProp from "./src/lensProp.ts";
+
+interface Configs {
+  [key: string]: unknown;
+}
+
+interface Parser {
+  (raw: string): Configs;
+}
+
+interface RuntimeAPI {
+  getEnvVars(): Configs;
+  readFile(path: string): string;
+}
+
+class DenoAPI implements RuntimeAPI {
+  getEnvVars() {
+    return Deno.env.toObject();
+  }
+  readFile(path: string) {
+    return Deno.readTextFileSync(path);
+  }
+}
+
+export class Coffee {
+  defaultConfigPath = "./config";
+  runtimeAPI: RuntimeAPI = new DenoAPI();
+  private isLoaded = false;
+
+  parsers: { [k: string]: Parser } = {
+    JSON: (t: string) => JSON.parse(t),
+  };
+
+  configs: Configs = {};
+
+  load(): void {
+    const rawConfigs = this.runtimeAPI.readFile(
+      this.defaultConfigPath + "/default.json",
+    );
+    this.configs = this.parsers.JSON(rawConfigs);
+    this.isLoaded = true;
   }
 
-  private async getDefaultConfig() {
-    let defaultConfig = await Deno.readTextFile("./config/config.json");
-    return defaultConfig;
-  }
-
-  private parse(configContent: string) {
-    return JSON.parse(configContent);
-  }
-
-  get(location: string) {
-    this.currentLocation = location;
-    return this;
-  }
-
-  toNumber(): number {
-    let configItem = this.getConfigItem();
-    if (typeof configItem !== "number") {
-      throw new Error(`${this.currentLocation} is not a number`);
-    }
-    return configItem;
-  }
-
-  toString(): string {
-    let configItem = this.getConfigItem();
-    if (typeof configItem !== "string") {
-      throw new Error(`${this.currentLocation} is not a string`);
-    }
-    return configItem;
-  }
-
-  toBoolean(): boolean {
-    let configItem = this.getConfigItem();
-    if (typeof configItem !== "boolean") {
-      throw new Error(`${this.currentLocation} is not a string`);
-    }
-    return configItem;
-  }
-
-  toAny(): any {
-    return this.getConfigItem();
-  }
-
-  private getConfigItem() {
-    return this.currentLocation.split(".").reduce((previuse: any, current) => {
-      return previuse[current];
-    }, this.config);
+  get(path: string): Validateable {
+    if (this.isLoaded === false) this.load();
+    const v = lensProp(this.configs, path);
+    return new Validateable(v);
   }
 }
 
