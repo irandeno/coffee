@@ -22,7 +22,7 @@ export default class Validateable {
 
   boolean(): boolean {
     if (typeof this.value !== "boolean") {
-      throw new Error(`${this.value} is not a string`);
+      throw new Error(`${this.value} is not a boolean`);
     }
     return this.value;
   }
