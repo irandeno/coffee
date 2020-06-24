@@ -14,6 +14,7 @@ type LoadOptions = {
 };
 
 interface RuntimeAPI {
+  getEnvVar(key: string): string | undefined;
   getEnvVars(): Configs;
   readFile(path: string): string;
 }
@@ -21,6 +22,9 @@ interface RuntimeAPI {
 class DenoAPI implements RuntimeAPI {
   getEnvVars() {
     return Deno.env.toObject();
+  }
+  getEnvVar(key: string) {
+    return Deno.env.get(key);
   }
   readFile(path: string) {
     return Deno.readTextFileSync(path);
@@ -43,6 +47,14 @@ export class Coffee {
       options.configPath + "/default.json",
     );
     this.configs = this.parsers.JSON(rawConfigs);
+    const environment = this.runtimeAPI.getEnvVar("DENO_ENV");
+    if (typeof environment !== "undefined") {
+      const rawEnvConfig = this.runtimeAPI.readFile(
+        options.configPath + `/${environment}.json`,
+      );
+      const envParsedConfig = this.parsers.JSON(rawEnvConfig);
+      Object.assign(this.configs, envParsedConfig);
+    }
     this.isLoaded = true;
   }
 
