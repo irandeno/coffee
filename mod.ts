@@ -54,13 +54,13 @@ export class Coffee {
   };
   configs: Configs = {};
 
-  private readConfigFile(filePath: string): Configs | undefined {
+  private readConfigFile(fileName: string): Configs | undefined {
     const rawConfigs = this.runtimeAPI.readFileIfExist(
-      this.loadOptions.configPath + "/" + filePath,
+      this.loadOptions.configPath + "/" + fileName,
     );
 
     if (!rawConfigs) return undefined;
-    const fileExt = filePath.split(".").slice(-1)[0];
+    const fileExt = fileName.split(".").slice(-1)[0];
     if (this.parsers[fileExt]) return this.parsers[fileExt](rawConfigs);
 
     throw new Error(`"${fileExt}" file extension not supported!`);
