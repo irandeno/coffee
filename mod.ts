@@ -1,5 +1,6 @@
 import Validateable from "./src/Validateable.ts";
 import lensProp from "./src/lensProp.ts";
+import deepExtend from "./src/deep-extend.ts";
 
 interface Configs {
   [key: string]: unknown;
@@ -11,28 +12,39 @@ interface Parser {
 
 type LoadOptions = {
   configPath?: string;
+  env?: string;
 };
 
 interface RuntimeAPI {
-  getEnvVar(key: string): string | undefined;
+  envName: string;
   getEnvVars(): Configs;
-  readFile(path: string): string;
+  getRuntimeEnv(): string | undefined;
+  readFileIfExist(path: string): string | undefined;
 }
 
 class DenoAPI implements RuntimeAPI {
+  envName = "DENO_ENV";
   getEnvVars() {
     return Deno.env.toObject();
   }
-  getEnvVar(key: string) {
-    return Deno.env.get(key);
+  readFileIfExist(path: string) {
+    try {
+      return Deno.readTextFileSync(path);
+    } catch (e) {
+      console.error(e);
+      return undefined;
+    }
   }
-  readFile(path: string) {
-    return Deno.readTextFileSync(path);
+  getRuntimeEnv() {
+    return Deno.env.get("DENO_ENV");
   }
 }
 
 export class Coffee {
-  defaultOptions: LoadOptions = { configPath: "./config" };
+  defaultOptions: LoadOptions = {
+    configPath: "./config",
+  };
+
   runtimeAPI: RuntimeAPI = new DenoAPI();
   private isLoaded = false;
 
@@ -42,19 +54,25 @@ export class Coffee {
 
   configs: Configs = {};
 
-  load(options: LoadOptions = this.defaultOptions): void {
-    const rawConfigs = this.runtimeAPI.readFile(
-      options.configPath + "/default.json",
+  load(opts: LoadOptions = {}): void {
+    this.defaultOptions = deepExtend(this.defaultOptions, opts);
+
+    const defaultConfigs = this.runtimeAPI.readFileIfExist(
+      this.defaultOptions.configPath + "/default.json",
     );
-    this.configs = this.parsers.JSON(rawConfigs);
-    const environment = this.runtimeAPI.getEnvVar("DENO_ENV");
-    if (typeof environment !== "undefined") {
-      const rawEnvConfig = this.runtimeAPI.readFile(
-        options.configPath + `/${environment}.json`,
+    if (defaultConfigs) this.configs = this.parsers.JSON(defaultConfigs);
+
+    const runtimeENV = this.runtimeAPI.getRuntimeEnv();
+    if (runtimeENV) {
+      const envConfigs = this.runtimeAPI.readFileIfExist(
+        this.defaultOptions.configPath + `/${runtimeENV}.json`,
       );
-      const envParsedConfig = this.parsers.JSON(rawEnvConfig);
-      Object.assign(this.configs, envParsedConfig);
+
+      if (envConfigs) {
+        this.configs = deepExtend(this.configs, this.parsers.JSON(envConfigs));
+      }
     }
+
     this.isLoaded = true;
   }
 

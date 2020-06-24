@@ -1,7 +1,7 @@
 import lp from "../../src/lensProp.ts";
 import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 
-Deno.test("Simple usage", () => {
+Deno.test("Lens-prop simple usage", () => {
   const o = {
     a: 1,
     b: {

@@ -1,9 +1,11 @@
-import coffee from "../../mod.ts";
+import { Coffee } from "../../mod.ts";
 import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 
-coffee.defaultConfigPath = "./test/mockConfig";
+const coffee = new Coffee();
 
-Deno.test("Coffee Simple usage", () => {
+coffee.defaultOptions.configPath = "./test/mockConfig";
+
+Deno.test("Coffee integration -> should get config", () => {
   const b = coffee.get("a.b").number();
   assertEquals(b, 4);
 });

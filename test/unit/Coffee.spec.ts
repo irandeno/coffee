@@ -10,7 +10,7 @@ const mockConfigs = {
 };
 
 // mocking runtimeAPI.readFile behavior
-coffee.runtimeAPI.readFile = function (): string {
+coffee.runtimeAPI.readFileIfExist = function (): string {
   return JSON.stringify(mockConfigs);
 };
 
