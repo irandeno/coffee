@@ -18,7 +18,13 @@ coffee.runtimeAPI.getRuntimeEnv = function () {
   return undefined;
 };
 
-Deno.test("Coffee Simple usage", () => {
+Deno.test("coffee.get", () => {
   const b = coffee.get("a.b").number();
   assertEquals(b, 3);
+});
+
+Deno.test("coffee.has", () => {
+  assertEquals(coffee.has("a.b"), true);
+  assertEquals(coffee.has("a"), true);
+  assertEquals(coffee.has("a.c"), false);
 });
