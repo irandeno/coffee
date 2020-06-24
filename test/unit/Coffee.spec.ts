@@ -74,3 +74,9 @@ Deno.test("It should load [DENO_ENV].json file", () => {
   assertEquals(t, "dev");
   assertEquals(a, true);
 });
+
+Deno.test("coffee.has", () => {
+  assertEquals(coffee.has("a.b"), true);
+  assertEquals(coffee.has("a"), true);
+  assertEquals(coffee.has("a.c"), false);
+});
