@@ -1,7 +1,7 @@
 import {
   assertEquals,
   assertThrows,
-} from "https://deno.land/std/testing/asserts.ts";
+} from "https://deno.land/std@0.58.0/testing/asserts.ts";
 import Validateable from "../../src/Validateable.ts";
 
 Deno.test("Validateable -> string", () => {
