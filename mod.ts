@@ -40,10 +40,12 @@ class DenoAPI implements RuntimeAPI {
   }
 }
 
+const defaultOptions = {
+  configPath: "./config",
+};
+
 export class Coffee {
-  private defaultOptions: LoadOptions = {
-    configPath: "./config",
-  };
+  private loadOptions: LoadOptions = {};
   private isLoaded = false;
 
   runtimeAPI: RuntimeAPI = new DenoAPI();
@@ -54,17 +56,17 @@ export class Coffee {
   configs: Configs = {};
 
   load(opts: LoadOptions = {}): void {
-    this.defaultOptions = deepExtend(this.defaultOptions, opts);
+    this.loadOptions = deepExtend(defaultOptions, opts);
 
     const defaultConfigs = this.runtimeAPI.readFileIfExist(
-      this.defaultOptions.configPath + "/default.json",
+      this.loadOptions.configPath + "/default.json",
     );
     if (defaultConfigs) this.configs = this.parsers.JSON(defaultConfigs);
 
     const runtimeENV = this.runtimeAPI.getRuntimeEnv();
     if (runtimeENV) {
       const envConfigs = this.runtimeAPI.readFileIfExist(
-        this.defaultOptions.configPath + `/${runtimeENV}.json`,
+        this.loadOptions.configPath + `/${runtimeENV}.json`,
       );
 
       if (envConfigs) {
