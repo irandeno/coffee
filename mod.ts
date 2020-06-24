@@ -9,6 +9,10 @@ interface Parser {
   (raw: string): Configs;
 }
 
+type LoadOptions = {
+  configPath?: string;
+};
+
 interface RuntimeAPI {
   getEnvVars(): Configs;
   readFile(path: string): string;
@@ -24,7 +28,7 @@ class DenoAPI implements RuntimeAPI {
 }
 
 export class Coffee {
-  defaultConfigPath = "./config";
+  defaultOptions: LoadOptions = { configPath: "./config" };
   runtimeAPI: RuntimeAPI = new DenoAPI();
   private isLoaded = false;
 
@@ -34,9 +38,9 @@ export class Coffee {
 
   configs: Configs = {};
 
-  load(): void {
+  load(options: LoadOptions = this.defaultOptions): void {
     const rawConfigs = this.runtimeAPI.readFile(
-      this.defaultConfigPath + "/default.json",
+      options.configPath + "/default.json",
     );
     this.configs = this.parsers.JSON(rawConfigs);
     this.isLoaded = true;
