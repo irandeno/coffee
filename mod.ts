@@ -2,8 +2,8 @@ import Validateable from "./src/Validateable.ts";
 import lensProp from "./src/lensProp.ts";
 import deepExtend from "./src/deepExtend.ts";
 
-interface Configs {
-  [key: string]: unknown;
+export interface Configs {
+  [key: string]: Configs | string | number | boolean;
 }
 
 interface Parser {
@@ -40,7 +40,7 @@ class DenoAPI implements RuntimeAPI {
   }
 }
 
-const defaultOptions = {
+const defaultOptions: Configs = {
   configPath: "./config",
 };
 
@@ -50,28 +50,32 @@ export class Coffee {
 
   runtimeAPI: RuntimeAPI = new DenoAPI();
   parsers: { [k: string]: Parser } = {
-    JSON: (t: string) => JSON.parse(t),
+    json: (t: string) => JSON.parse(t),
   };
-
   configs: Configs = {};
+
+  private readConfigFile(fileName: string): Configs | undefined {
+    const rawConfigs = this.runtimeAPI.readFileIfExist(
+      this.loadOptions.configPath + "/" + fileName,
+    );
+
+    if (!rawConfigs) return undefined;
+    const fileExt = fileName.split(".").slice(-1)[0];
+    if (this.parsers[fileExt]) return this.parsers[fileExt](rawConfigs);
+
+    throw new Error(`"${fileExt}" file extension not supported!`);
+  }
 
   load(opts: LoadOptions = {}): void {
     this.loadOptions = deepExtend(defaultOptions, opts);
 
-    const defaultConfigs = this.runtimeAPI.readFileIfExist(
-      this.loadOptions.configPath + "/default.json",
-    );
-    if (defaultConfigs) this.configs = this.parsers.JSON(defaultConfigs);
+    const defaultConfigs = this.readConfigFile("default.json");
+    if (defaultConfigs) this.configs = defaultConfigs;
 
     const runtimeENV = this.runtimeAPI.getRuntimeEnv();
     if (runtimeENV) {
-      const envConfigs = this.runtimeAPI.readFileIfExist(
-        this.loadOptions.configPath + `/${runtimeENV}.json`,
-      );
-
-      if (envConfigs) {
-        this.configs = deepExtend(this.configs, this.parsers.JSON(envConfigs));
-      }
+      const envConfigs = this.readConfigFile(`${runtimeENV}.json`);
+      if (envConfigs) this.configs = deepExtend(this.configs, envConfigs);
     }
 
     this.isLoaded = true;
@@ -91,6 +95,11 @@ export class Coffee {
     } catch (e) {
       return false;
     }
+  }
+
+  set(path: string, value: string | number | boolean): void {
+    if (this.isLoaded === false) this.load();
+    lensProp(this.configs, path, value);
   }
 }
 
