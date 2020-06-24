@@ -14,6 +14,10 @@ coffee.runtimeAPI.readFileIfExist = function (): string {
   return JSON.stringify(mockConfigs);
 };
 
+coffee.runtimeAPI.getRuntimeEnv = function () {
+  return undefined;
+};
+
 Deno.test("Coffee Simple usage", () => {
   const b = coffee.get("a.b").number();
   assertEquals(b, 3);

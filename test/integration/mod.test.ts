@@ -5,6 +5,10 @@ const coffee = new Coffee();
 
 coffee.defaultOptions.configPath = "./test/mockConfig";
 
+coffee.runtimeAPI.getRuntimeEnv = function () {
+  return undefined;
+};
+
 Deno.test("Coffee integration -> should get config", () => {
   const b = coffee.get("a.b").number();
   assertEquals(b, 4);
