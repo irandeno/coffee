@@ -41,13 +41,12 @@ class DenoAPI implements RuntimeAPI {
 }
 
 export class Coffee {
-  defaultOptions: LoadOptions = {
+  private defaultOptions: LoadOptions = {
     configPath: "./config",
   };
-
-  runtimeAPI: RuntimeAPI = new DenoAPI();
   private isLoaded = false;
 
+  runtimeAPI: RuntimeAPI = new DenoAPI();
   parsers: { [k: string]: Parser } = {
     JSON: (t: string) => JSON.parse(t),
   };
