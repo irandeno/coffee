@@ -1,6 +1,6 @@
 import Validateable from "./src/Validateable.ts";
 import lensProp from "./src/lensProp.ts";
-import deepExtend from "./src/deep-extend.ts";
+import deepExtend from "./src/deepExtend.ts";
 
 interface Configs {
   [key: string]: unknown;

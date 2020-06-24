@@ -1,5 +1,5 @@
-import de from "../../src/deep-extend.ts";
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import de from "../../src/deepExtend.ts";
+import { assertEquals } from "https://deno.land/std@0.58.0/testing/asserts.ts";
 
 Deno.test("should return a merged object", () => {
   const result = de({
