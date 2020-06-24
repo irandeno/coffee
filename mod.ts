@@ -82,6 +82,16 @@ export class Coffee {
     const v = lensProp(this.configs, path);
     return new Validateable(v);
   }
+
+  has(path: string): boolean {
+    if (this.isLoaded === false) this.load();
+    try {
+      const v = lensProp(this.configs, path);
+      return v !== undefined;
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 export default new Coffee();
