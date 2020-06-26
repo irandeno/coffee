@@ -4,7 +4,7 @@ import { assertEquals } from "https://deno.land/std@0.58.0/testing/asserts.ts";
 const coffee = new Coffee();
 
 coffee.runtimeAPI.getEnvVar = () => undefined;
-coffee.runtimeAPI.readFileIfExist = () => undefined
+coffee.runtimeAPI.readFileIfExist = () => undefined;
 coffee.runtimeAPI.getRuntimeEnv = () => undefined;
 
 Deno.test("it should read default.json file configs", () => {
@@ -21,8 +21,7 @@ Deno.test("it should read default.json file configs", () => {
     return undefined;
   };
 
-  coffee.load()
-
+  coffee.load();
 
   const b: number = coffee.get("a.b").number();
   const t: string = coffee.get("a.t").string();
@@ -52,7 +51,7 @@ Deno.test("coffee.set -> it should override existing config", () => {
 });
 
 Deno.test("It should load [DENO_ENV].json file configs", () => {
-  coffee.runtimeAPI.getRuntimeEnv = () => "development"
+  coffee.runtimeAPI.getRuntimeEnv = () => "development";
 
   coffee.runtimeAPI.readFileIfExist = function (path) {
     if (path.includes("default.json")) {
@@ -64,7 +63,7 @@ Deno.test("It should load [DENO_ENV].json file configs", () => {
         },
       });
     }
-  
+
     if (path.includes("development.json")) {
       return JSON.stringify({
         a: {
@@ -72,10 +71,9 @@ Deno.test("It should load [DENO_ENV].json file configs", () => {
         },
       });
     }
-  
+
     return undefined;
   };
-  
 
   coffee.load();
 

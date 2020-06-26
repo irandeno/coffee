@@ -10,7 +10,7 @@ Deno.test("should return a merged object", () => {
     d: true,
     j: [],
     k: [1, 2],
-    n: "a"
+    n: "a",
   }, {
     a: {
       b: 10,
@@ -25,7 +25,7 @@ Deno.test("should return a merged object", () => {
     l: [1, 2],
     r: /s/,
     o: {},
-    n: undefined
+    n: undefined,
   });
 
   assertEquals(result, {
@@ -44,7 +44,7 @@ Deno.test("should return a merged object", () => {
     l: [1, 2],
     r: /s/,
     o: {},
-    n: "a"
+    n: "a",
   });
 });
 

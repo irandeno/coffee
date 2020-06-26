@@ -25,4 +25,3 @@ Deno.test("Validateable -> boolean", () => {
   assertThrows(() => new Validateable("").boolean(), Error);
   assertThrows(() => new Validateable(0).boolean(), Error);
 });
-
