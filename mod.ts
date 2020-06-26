@@ -1,6 +1,7 @@
 import Validateable from "./src/Validateable.ts";
 import lensProp from "./src/lensProp.ts";
 import deepExtend from "./src/deepExtend.ts";
+import deepObjectMap from "./src/deepObjectMap.ts";
 
 export interface Configs {
   [key: string]: Configs | string | number | boolean;
@@ -11,28 +12,29 @@ interface Parser {
 }
 
 type LoadOptions = {
-  configPath?: string;
+  configDir: string;
+  customEnvVarFileName: string;
   env?: string;
 };
 
 interface RuntimeAPI {
   envName: string;
-  getEnvVars(): Configs;
+  getEnvVar(key: string): string | undefined;
   getRuntimeEnv(): string | undefined;
   readFileIfExist(path: string): string | undefined;
 }
 
 class DenoAPI implements RuntimeAPI {
   envName = "DENO_ENV";
-  getEnvVars() {
-    return Deno.env.toObject();
+  getEnvVar(key: string) {
+    return Deno.env.get(key);
   }
   readFileIfExist(path: string) {
     try {
       return Deno.readTextFileSync(path);
     } catch (e) {
-      console.error(e);
-      return undefined;
+      if (e.name === "NotFound") return;
+      throw e;
     }
   }
   getRuntimeEnv() {
@@ -40,12 +42,13 @@ class DenoAPI implements RuntimeAPI {
   }
 }
 
-const defaultOptions: Configs = {
-  configPath: "./config",
+const defaultOptions: LoadOptions = {
+  configDir: "./config",
+  customEnvVarFileName: "custom-environment-variables",
 };
 
 export class Coffee {
-  private loadOptions: LoadOptions = {};
+  private loadOptions: LoadOptions = defaultOptions;
   private isLoaded = false;
 
   runtimeAPI: RuntimeAPI = new DenoAPI();
@@ -56,7 +59,7 @@ export class Coffee {
 
   private readConfigFile(fileName: string): Configs | undefined {
     const rawConfigs = this.runtimeAPI.readFileIfExist(
-      this.loadOptions.configPath + "/" + fileName,
+      this.loadOptions.configDir + "/" + fileName,
     );
 
     if (!rawConfigs) return undefined;
@@ -66,17 +69,40 @@ export class Coffee {
     throw new Error(`"${fileExt}" file extension not supported!`);
   }
 
-  load(opts: LoadOptions = {}): void {
-    this.loadOptions = deepExtend(defaultOptions, opts);
-
+  private loadDefaultConfigs() {
     const defaultConfigs = this.readConfigFile("default.json");
-    if (defaultConfigs) this.configs = defaultConfigs;
+    if (defaultConfigs) deepExtend(this.configs, defaultConfigs);
+  }
 
+  private loadEnvRelativeConfigs() {
     const runtimeENV = this.runtimeAPI.getRuntimeEnv();
     if (runtimeENV) {
       const envConfigs = this.readConfigFile(`${runtimeENV}.json`);
-      if (envConfigs) this.configs = deepExtend(this.configs, envConfigs);
+      if (envConfigs) deepExtend(this.configs, envConfigs);
     }
+  }
+
+  private loadCustomEnvVarConfigs() {
+    const customEnvVars = this.readConfigFile(
+      `${this.loadOptions.customEnvVarFileName}.json`,
+    );
+
+    if (customEnvVars) {
+      deepObjectMap((value) => {
+        if (typeof value !== "string") return;
+        return this.runtimeAPI.getEnvVar(value);
+      }, customEnvVars);
+
+      deepExtend(this.configs, customEnvVars);
+    }
+  }
+
+  load(opts: Partial<LoadOptions> = {}): void {
+    this.loadOptions = deepExtend(defaultOptions, opts);
+
+    this.loadDefaultConfigs();
+    this.loadEnvRelativeConfigs();
+    this.loadCustomEnvVarConfigs();
 
     this.isLoaded = true;
   }

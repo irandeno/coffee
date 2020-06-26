@@ -8,7 +8,7 @@ coffee.runtimeAPI.getRuntimeEnv = function () {
 };
 
 coffee.load({
-  configPath: "./test/mockConfig",
+  configDir: "./test/mockConfig",
 });
 
 Deno.test("Coffee integration -> should get config", () => {
