@@ -11,11 +11,8 @@ export default class Validateable {
     }
 
     if (typeof this.value === "string" && this.value.length > 0) {
-      console.log("here");
-      if (this.value.match(/^-{0,1}\d+$/)) {
-        this.value = parseInt(this.value);
-        return this.number();
-      }
+      this.value = Number(this.value);
+      return this.number();
     }
 
     throw new Error(`${this.value} is not a number`);

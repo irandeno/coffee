@@ -12,6 +12,9 @@ Deno.test("Validateable -> string", () => {
 
 Deno.test("Validateable -> number", () => {
   assertEquals(new Validateable("8").number(), 8);
+  assertEquals(new Validateable("8.5").number(), 8.5);
+  assertEquals(new Validateable("-8").number(), -8);
+  assertEquals(new Validateable("+8").number(), 8);
   assertThrows(() => new Validateable("").number(), Error);
   assertThrows(() => new Validateable("12AB").number(), Error);
 });

@@ -22,6 +22,7 @@ interface RuntimeAPI {
   getEnvVar(key: string): string | undefined;
   getRuntimeEnv(): string | undefined;
   readFileIfExist(path: string): string | undefined;
+  isDirExist(path: string): boolean;
 }
 
 class DenoAPI implements RuntimeAPI {
@@ -33,12 +34,22 @@ class DenoAPI implements RuntimeAPI {
     try {
       return Deno.readTextFileSync(path);
     } catch (e) {
-      if (e.name === "NotFound") return;
+      if (e instanceof Deno.errors.NotFound) return;
       throw e;
     }
   }
   getRuntimeEnv() {
     return Deno.env.get("DENO_ENV");
+  }
+
+  isDirExist(path: string) {
+    try {
+      Deno.readDirSync(path);
+      return true;
+    } catch (e) {
+      if (e instanceof Deno.errors.NotFound) return false;
+      throw e;
+    }
   }
 }
 
@@ -99,6 +110,12 @@ export class Coffee {
 
   load(opts: Partial<LoadOptions> = {}): void {
     this.loadOptions = deepExtend(defaultOptions, opts);
+    const result = this.runtimeAPI.isDirExist(this.loadOptions.configDir);
+    if (!result) {
+      throw new Error(
+        `configDir: ${this.loadOptions.configDir} is not existed!`,
+      );
+    }
 
     this.loadDefaultConfigs();
     this.loadEnvRelativeConfigs();
