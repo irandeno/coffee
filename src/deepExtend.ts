@@ -26,6 +26,8 @@ export default function deepExtend<T = AnyObject>(
       ) {
         continue;
       }
+
+      if (source[property] === undefined) continue;
       destination[property] = source[property];
     }
   }
