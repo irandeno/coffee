@@ -15,12 +15,11 @@ Deno.test("Coffee integration -> should get config", () => {
   const b = coffee.get("a.b").number();
   assertEquals(b, 4);
 });
-
+coffee.load({
+  configDir: "./../mockConfig",
+  configFile: "default2", // yml file
+});
 Deno.test("Coffee supports yml files -> return 4 and 5", () => {
-  coffee.load({
-    configDir: "../mockConfig",
-    configFile: "default2", // yml file
-  });
   const b = coffee.get("a.b").number();
   assertEquals(b, 4);
   coffee.set("a.b", 5);
