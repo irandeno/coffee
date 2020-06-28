@@ -1,12 +1,8 @@
-import {
-  parse as ymlParse,
-  JSON_SCHEMA,
-} from "https://deno.land/std/encoding/yaml.ts";
 import Validateable from "./src/Validateable.ts";
 import lensProp from "./src/lensProp.ts";
 import deepExtend from "./src/deepExtend.ts";
 import deepObjectMap from "./src/deepObjectMap.ts";
-
+import { ymlReader } from "./src/ymlReader.ts";
 export interface Configs {
   [key: string]: Configs | string | number | boolean;
 }
@@ -75,19 +71,9 @@ export class Coffee {
   runtimeAPI: RuntimeAPI = new DenoAPI();
   parsers: { [k: string]: Parser } = {
     json: (t: string) => JSON.parse(t),
-    yml: (t: string) => this.ymlReader(t),
+    yml: (t: string) => ymlReader(t),
   };
   configs: Configs = {};
-  private ymlReader(t: string): Configs {
-    // ymlParse returns unknown, We should convert its type to Configs type
-    const parsedYml = ymlParse(t, {
-      schema: JSON_SCHEMA,
-      json: true,
-    });
-    const ymlToJSON = JSON.stringify(parsedYml);
-
-    return JSON.parse(ymlToJSON);
-  }
 
   private readConfigFile(fileName: string): Configs | undefined {
     const rawConfigs = this.runtimeAPI.readFileIfExist(
