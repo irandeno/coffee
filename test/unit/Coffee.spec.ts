@@ -21,7 +21,7 @@ Deno.test("it should read default.json file configs", () => {
     return undefined;
   };
 
-  coffee.load();
+  coffee.load({ configFile: "default.json" });
 
   const b: number = coffee.get("a.b").number();
   const t: string = coffee.get("a.t").string();

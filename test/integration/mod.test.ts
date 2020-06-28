@@ -16,7 +16,7 @@ Deno.test("Coffee integration -> should get config", () => {
   assertEquals(b, 4);
 });
 coffee.load({
-  configDir: "./../mockConfig",
+  configDir: "./test/mockConfig",
   configFile: "default2", // yml file
 });
 Deno.test("Coffee supports yml files -> return 4 and 5", () => {
@@ -24,5 +24,5 @@ Deno.test("Coffee supports yml files -> return 4 and 5", () => {
   assertEquals(b, 4);
   coffee.set("a.b", 5);
   const newB = coffee.get("a.b").number();
-  assertEquals(b, 5);
+  assertEquals(newB, 5);
 });
