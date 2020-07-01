@@ -1,6 +1,4 @@
-type AnyObject = {
-  [key in string | number]: any;
-};
+type AnyObject = { [key in string | number]: any };
 
 interface CallbackFn {
   (value: unknown): unknown;

@@ -1,6 +1,4 @@
-type AnyObject = {
-  [key in string | number]: any;
-};
+type AnyObject = { [key in string | number]: any };
 
 interface DeepExtendOptions {
   skipIfExist?: boolean;
@@ -21,9 +19,7 @@ export default function deepExtend<T = AnyObject>(
       destination[property] = destination[property] || {};
       deepExtend(destination[property], source[property], options);
     } else {
-      if (
-        options.skipIfExist === true && destination[property] !== undefined
-      ) {
+      if (options.skipIfExist === true && destination[property] !== undefined) {
         continue;
       }
 
