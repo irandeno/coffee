@@ -2,5 +2,6 @@
    "cSpell.words": [
       "Deno",
       "Validateable"
-   ]
+   ],
+   "deno.enable": true
 }

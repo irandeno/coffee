@@ -7,7 +7,7 @@ coffee.runtimeAPI.getRuntimeEnv = function () {
   return undefined;
 };
 
-Deno.test("Coffee integration -> should get config", () => {
+Deno.test("[integration] get config from json", () => {
   coffee.load({
     configDir: "./test/mockConfig/json",
   });
@@ -15,7 +15,7 @@ Deno.test("Coffee integration -> should get config", () => {
   assertEquals(b, 1);
 });
 
-Deno.test("Coffee supports yml files -> return 2 and 3", () => {
+Deno.test("[integration] get config from yml", () => {
   coffee.load({
     configDir: "./test/mockConfig/yml",
   });

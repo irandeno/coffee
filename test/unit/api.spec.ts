@@ -7,7 +7,7 @@ coffee.runtimeAPI.getEnvVar = () => undefined;
 coffee.runtimeAPI.readFileIfExist = () => undefined;
 coffee.runtimeAPI.getRuntimeEnv = () => undefined;
 
-Deno.test("it should read default.json file configs", () => {
+Deno.test("[api] read default.json file configs", () => {
   coffee.runtimeAPI.readFileIfExist = function (path) {
     if (path.includes("default.json")) {
       return JSON.stringify({
@@ -32,25 +32,25 @@ Deno.test("it should read default.json file configs", () => {
   assertEquals(a, true);
 });
 
-Deno.test("coffee.has", () => {
+Deno.test("[api] coffee.has", () => {
   assertEquals(coffee.has("a.b"), true);
   assertEquals(coffee.has("a"), true);
   assertEquals(coffee.has("a.c"), false);
 });
 
-Deno.test("coffee.set -> it should create new config", () => {
+Deno.test("[api] coffee.set - create new config", () => {
   coffee.set("b.c", "newValue");
   assertEquals((coffee.configs.b as Configs).c, "newValue");
   assertEquals(coffee.get("b.c").string(), "newValue");
 });
 
-Deno.test("coffee.set -> it should override existing config", () => {
+Deno.test("[api] coffee.set - override existing config", () => {
   coffee.set("b.c", "newValue2");
   assertEquals((coffee.configs.b as Configs).c, "newValue2");
   assertEquals(coffee.get("b.c").string(), "newValue2");
 });
 
-Deno.test("It should load [DENO_ENV].json file configs", () => {
+Deno.test("[api] load [DENO_ENV].json file configs", () => {
   coffee.runtimeAPI.getRuntimeEnv = () => "development";
 
   coffee.runtimeAPI.readDirEntries = () => true;
@@ -97,13 +97,13 @@ Deno.test("It should load [DENO_ENV].json file configs", () => {
   assertEquals(a, true);
 });
 
-Deno.test("coffee.has", () => {
+Deno.test("[api] coffee.has", () => {
   assertEquals(coffee.has("a.b"), true);
   assertEquals(coffee.has("a"), true);
   assertEquals(coffee.has("a.c"), false);
 });
 
-Deno.test("It should load custom-environment-variable file configs", () => {
+Deno.test("[api] load custom-environment-variable file configs", () => {
   coffee.runtimeAPI.getRuntimeEnv = () => "development";
 
   coffee.runtimeAPI.readDirEntries = () => true;
