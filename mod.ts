@@ -3,6 +3,9 @@ import lensProp from "./src/lensProp.ts";
 import deepExtend from "./src/deepExtend.ts";
 import deepObjectMap from "./src/deepObjectMap.ts";
 import { ymlReader } from "./src/ymlReader.ts";
+import * as errors from "./src/errors.ts";
+export { errors };
+
 export interface Configs {
   [key: string]: Configs | string | number | boolean;
 }
@@ -66,7 +69,9 @@ class DenoAPI implements RuntimeAPI {
       }
       return this.directoryEntries.length > 0;
     } catch (e) {
-      if (e instanceof Deno.errors.NotFound) return false;
+      if (e instanceof Deno.errors.NotFound) {
+        throw new errors.NoConfigDir(dir);
+      }
       throw e;
     }
   }
@@ -97,8 +102,6 @@ export class Coffee {
     if (!rawConfigs) return undefined;
     const fileExt = fileName.split(".").slice(-1)[0];
     if (this.parsers[fileExt]) return this.parsers[fileExt](rawConfigs);
-
-    throw new Error(`"${fileExt}" file extension not supported!`);
   }
 
   private loadConfigs() {
@@ -149,9 +152,7 @@ export class Coffee {
     );
 
     if (!dirEntries) {
-      throw new Error(
-        `configDir: ${this.loadOptions.configDir} is not existed or has no config files!`,
-      );
+      throw new errors.NoConfigFile(this.loadOptions.configDir);
     }
     this.loadConfigs();
     this.loadEnvRelativeConfigs();
@@ -162,7 +163,7 @@ export class Coffee {
   get(path: string): Validateable {
     if (this.isLoaded === false) this.load();
     const v = lensProp(this.configs, path);
-    return new Validateable(v);
+    return new Validateable(v, path);
   }
 
   has(path: string): boolean {

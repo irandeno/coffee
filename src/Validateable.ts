@@ -1,28 +1,35 @@
+import { BadConfigType } from "./errors.ts";
+
 export default class Validateable {
   value: unknown;
-  constructor(v: unknown) {
+  path: string | undefined;
+  constructor(v: unknown, path?: string) {
     this.value = v;
+    this.path = path;
   }
 
   number(): number {
     if (typeof this.value === "number") {
-      if (isNaN(this.value)) throw new Error(`${this.value} is NaN`);
+      if (isNaN(this.value)) {
+        throw new BadConfigType(this.value, "number", this.path);
+      }
       return this.value;
     }
 
     if (typeof this.value === "string" && this.value.length > 0) {
-      this.value = Number(this.value);
-      return this.number();
+      let numericValue = Number(this.value);
+      if (this.value as unknown == numericValue) {
+        return numericValue;
+      }
     }
 
-    throw new Error(`${this.value} is not a number`);
+    throw new BadConfigType(this.value, "number", this.path);
   }
 
   string(): string {
-    if (typeof this.value !== "string") {
-      throw new Error(`${this.value} is not a string`);
+    if (typeof this.value !== "string" || this.value.length === 0) {
+      throw new BadConfigType(this.value, "string", this.path);
     }
-    if (this.value.length === 0) throw new Error("Value is empty string");
     return this.value;
   }
 
@@ -33,6 +40,6 @@ export default class Validateable {
     if (this.value === "true") return true;
     if (this.value === "false") return false;
 
-    throw new Error(`${this.value} is not a boolean`);
+    throw new BadConfigType(this.value, "boolean", this.path);
   }
 }
