@@ -14,20 +14,22 @@ interface Parser {
 type LoadOptions = {
   configDir: string;
   customEnvVarFileName: string;
-  configFile?: string;
   env?: string;
 };
 
 interface RuntimeAPI {
   envName: string;
+  directoryEntries: Deno.DirEntry[];
   getEnvVar(key: string): string | undefined;
   getRuntimeEnv(): string | undefined;
   readFileIfExist(path: string): string | undefined;
-  isDirExist(path: string): boolean;
+  scanDirForFile(filename: string, extentions: string[]): string | undefined;
+  readDirEntries(dir: string, allowedExtentions: string[]): boolean;
 }
 
 class DenoAPI implements RuntimeAPI {
   envName = "DENO_ENV";
+  directoryEntries: Deno.DirEntry[] = [];
   getEnvVar(key: string) {
     return Deno.env.get(key);
   }
@@ -41,13 +43,28 @@ class DenoAPI implements RuntimeAPI {
     }
   }
   getRuntimeEnv() {
-    return Deno.env.get("DENO_ENV");
+    return Deno.env.get(this.envName);
   }
 
-  isDirExist(path: string) {
+  scanDirForFile(filename: string, extentions: string[]): string | undefined {
+    for (const extention of extentions) {
+      for (const entry of this.directoryEntries) {
+        if (entry.name === `${filename}.${extention}`) return entry.name;
+      }
+    }
+  }
+
+  readDirEntries(dir: string, allowedExtentions: string[]): boolean {
     try {
-      Deno.readDirSync(path);
-      return true;
+      while (this.directoryEntries.length > 0) this.directoryEntries.pop();
+      for (const entry of Deno.readDirSync(dir)) {
+        if (!entry.isFile) continue;
+        const entryExt = entry.name.substring(entry.name.lastIndexOf(".") + 1);
+        if (allowedExtentions.includes(entryExt)) {
+          this.directoryEntries.push(entry);
+        }
+      }
+      return this.directoryEntries.length > 0;
     } catch (e) {
       if (e instanceof Deno.errors.NotFound) return false;
       throw e;
@@ -63,10 +80,7 @@ const defaultOptions: LoadOptions = {
 export class Coffee {
   private loadOptions: LoadOptions = defaultOptions;
   private isLoaded = false;
-  private fileExts = [
-    "json",
-    "yml",
-  ];
+  private fileExts = ["json", "yml"]; // order is matters.
 
   runtimeAPI: RuntimeAPI = new DenoAPI();
   parsers: { [k: string]: Parser } = {
@@ -87,60 +101,61 @@ export class Coffee {
     throw new Error(`"${fileExt}" file extension not supported!`);
   }
 
-  private loadConfigs(fileName = "default") {
-    for (const fileExt of this.fileExts) {
-      let configs = this.readConfigFile(`${fileName}.${fileExt}`);
-      if (configs) {
-        deepExtend(this.configs, configs);
-        break;
-      }
-    }
+  private loadConfigs() {
+    const configFileName = this.runtimeAPI.scanDirForFile(
+      "default",
+      this.fileExts,
+    );
+    if (typeof configFileName == "undefined") return;
+    let configs = this.readConfigFile(configFileName);
+    if (typeof configs == "undefined") return;
+    deepExtend(this.configs, configs);
   }
 
   private loadEnvRelativeConfigs() {
     const runtimeENV = this.runtimeAPI.getRuntimeEnv();
-    if (runtimeENV) {
-      for (const fileExt of this.fileExts) {
-        const envConfigs = this.readConfigFile(`${runtimeENV}.${fileExt}`);
-        if (envConfigs) {
-          deepExtend(this.configs, envConfigs);
-          break;
-        }
-      }
-    }
+    if (typeof runtimeENV == "undefined") return;
+    const envRelatedFileName = this.runtimeAPI.scanDirForFile(
+      runtimeENV,
+      this.fileExts,
+    );
+    if (typeof envRelatedFileName == "undefined") return;
+    const envConfigs = this.readConfigFile(envRelatedFileName);
+    if (typeof envConfigs == "undefined") return;
+    deepExtend(this.configs, envConfigs);
   }
 
   private loadCustomEnvVarConfigs() {
-    for (const fileExt of this.fileExts) {
-      const customEnvVars = this.readConfigFile(
-        `${this.loadOptions.customEnvVarFileName}.${fileExt}`,
-      );
+    const customEnvVarFileName = this.runtimeAPI.scanDirForFile(
+      this.loadOptions.customEnvVarFileName,
+      this.fileExts,
+    );
+    if (typeof customEnvVarFileName == "undefined") return;
+    const customEnvVars = this.readConfigFile(customEnvVarFileName);
+    if (typeof customEnvVars == "undefined") return;
+    deepObjectMap((value) => {
+      if (typeof value !== "string") return;
+      return this.runtimeAPI.getEnvVar(value);
+    }, customEnvVars);
 
-      if (customEnvVars) {
-        deepObjectMap((value) => {
-          if (typeof value !== "string") return;
-          return this.runtimeAPI.getEnvVar(value);
-        }, customEnvVars);
-
-        deepExtend(this.configs, customEnvVars);
-        break;
-      }
-    }
+    deepExtend(this.configs, customEnvVars);
   }
 
   load(opts: Partial<LoadOptions> = {}): void {
     this.loadOptions = deepExtend(defaultOptions, opts);
-    const result = this.runtimeAPI.isDirExist(this.loadOptions.configDir);
-    if (!result) {
+    const dirEntries = this.runtimeAPI.readDirEntries(
+      this.loadOptions.configDir,
+      this.fileExts,
+    );
+
+    if (!dirEntries) {
       throw new Error(
-        `configDir: ${this.loadOptions.configDir} is not existed!`,
+        `configDir: ${this.loadOptions.configDir} is not existed or has no config files!`,
       );
     }
-
-    this.loadConfigs(this.loadOptions.configFile);
+    this.loadConfigs();
     this.loadEnvRelativeConfigs();
     this.loadCustomEnvVarConfigs();
-
     this.isLoaded = true;
   }
 

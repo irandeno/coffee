@@ -1,5 +1,5 @@
 import { Coffee } from "../../mod.ts";
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.58.0/testing/asserts.ts";
 
 const coffee = new Coffee();
 
@@ -7,22 +7,21 @@ coffee.runtimeAPI.getRuntimeEnv = function () {
   return undefined;
 };
 
-coffee.load({
-  configDir: "./test/mockConfig",
+Deno.test("Coffee integration -> should get config", () => {
+  coffee.load({
+    configDir: "./test/mockConfig/json",
+  });
+  const b = coffee.get("a.b").number();
+  assertEquals(b, 1);
 });
 
-Deno.test("Coffee integration -> should get config", () => {
+Deno.test("Coffee supports yml files -> return 2 and 3", () => {
+  coffee.load({
+    configDir: "./test/mockConfig/yml",
+  });
   const b = coffee.get("a.b").number();
-  assertEquals(b, 4);
-});
-coffee.load({
-  configDir: "./test/mockConfig",
-  configFile: "default2", // yml file
-});
-Deno.test("Coffee supports yml files -> return 4 and 5", () => {
-  const b = coffee.get("a.b").number();
-  assertEquals(b, 4);
-  coffee.set("a.b", 5);
+  assertEquals(b, 2);
+  coffee.set("a.b", 3);
   const newB = coffee.get("a.b").number();
-  assertEquals(newB, 5);
+  assertEquals(newB, 3);
 });
