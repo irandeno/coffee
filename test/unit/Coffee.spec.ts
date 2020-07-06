@@ -21,7 +21,7 @@ Deno.test("it should read default.json file configs", () => {
     return undefined;
   };
 
-  coffee.load({ configFile: "default.json" });
+  coffee.load({ configDir: "./test/mockConfig/json" });
 
   const b: number = coffee.get("a.b").number();
   const t: string = coffee.get("a.t").string();
@@ -52,6 +52,17 @@ Deno.test("coffee.set -> it should override existing config", () => {
 
 Deno.test("It should load [DENO_ENV].json file configs", () => {
   coffee.runtimeAPI.getRuntimeEnv = () => "development";
+
+  coffee.runtimeAPI.readDirEntries = () => true;
+
+  coffee.runtimeAPI.directoryEntries = [
+    {
+      name: "development.json",
+      isFile: true,
+      isDirectory: false,
+      isSymlink: false,
+    },
+  ];
 
   coffee.runtimeAPI.readFileIfExist = function (path) {
     if (path.includes("default.json")) {
@@ -93,9 +104,18 @@ Deno.test("coffee.has", () => {
 });
 
 Deno.test("It should load custom-environment-variable file configs", () => {
-  coffee.runtimeAPI.getRuntimeEnv = function () {
-    return "development";
-  };
+  coffee.runtimeAPI.getRuntimeEnv = () => "development";
+
+  coffee.runtimeAPI.readDirEntries = () => true;
+
+  coffee.runtimeAPI.directoryEntries = [
+    {
+      name: "custom-environment-variables.json",
+      isFile: true,
+      isDirectory: false,
+      isSymlink: false,
+    },
+  ];
 
   coffee.runtimeAPI.readFileIfExist = function (path) {
     if (path.includes("custom-environment-variables.json")) {
@@ -123,10 +143,4 @@ Deno.test("It should load custom-environment-variable file configs", () => {
 
   assertEquals(port, "3000");
   assertEquals(secret, "ABC");
-});
-
-Deno.test("coffee.has", () => {
-  assertEquals(coffee.has("a.b"), true);
-  assertEquals(coffee.has("a"), true);
-  assertEquals(coffee.has("a.c"), false);
 });
