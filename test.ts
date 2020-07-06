@@ -1,4 +1,4 @@
-import "./test/unit/Coffee.spec.ts";
+import "./test/unit/api.spec.ts";
 import "./test/unit/lensProp.spec.ts";
 import "./test/unit/Validateable.spec.ts";
 import "./test/unit/deepExtend.spec.ts";
