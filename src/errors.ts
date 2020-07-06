@@ -2,7 +2,7 @@ export class BadConfigPath extends Error {
   constructor(path: string) {
     super();
     this.name = "BadConfigPath";
-    this.message = `try to get an undefined path "${path}."`;
+    this.message = `try to get an undefined path "${path}".`;
   }
 }
 
@@ -19,7 +19,7 @@ export class NoConfigDir extends Error {
   constructor(dir: string) {
     super();
     this.name = "NoConfigDir";
-    this.message = `"${dir}" directory is not exists.`;
+    this.message = `"${dir}" directory does not exist.`;
   }
 }
 
