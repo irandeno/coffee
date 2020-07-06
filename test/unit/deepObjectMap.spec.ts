@@ -1,7 +1,7 @@
 import dom from "../../src/deepObjectMap.ts";
 import { assertEquals } from "https://deno.land/std@0.58.0/testing/asserts.ts";
 
-Deno.test("should deep-map a object", () => {
+Deno.test("[deepObjectMap] deep-map a object", () => {
   const o = {
     a: {
       b: {},
