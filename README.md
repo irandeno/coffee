@@ -60,9 +60,9 @@ coffee can read the configurations from the desired directory.
 // coffee.ts
 import coffee from "https://deno.land/x/coffee/mod.ts";
 coffee.load({ 
-   configDir: "./custom",       // specify the custom config directory
+   configDir: "./custom", // specify the custom config directory
    customEnvVarFileName: "cev", // specify the desired custom environment variable config file name
-   env: "production"            // force relative environment variables to loads from this env
+   env: "production" // force relative environment variables to loads from this env
 },);
 const dbName: string = coffee.get("database.name").string();
 ```
