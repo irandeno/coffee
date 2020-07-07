@@ -20,7 +20,8 @@ let dbPassword: number = coffee.get("database.password").number(); // DB_PASSWOR
 coffee.load({
   configDir: "./custom",
   customEnvVarFileName: "cev",
-  env: "production",
+  env: "production", // by default coffee read environment from `DENO_ENV` environment variable,
+  // this option is to force coffee to read from this env and ignore `DENO_ENV`.
 });
 
 let newDbName: string = coffee.get("database.name").string(); // my-new-db-name, loaded from default.yml config file
