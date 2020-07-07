@@ -116,7 +116,9 @@ export class Coffee {
   }
 
   private loadEnvRelativeConfigs() {
-    const runtimeENV = this.runtimeAPI.getRuntimeEnv();
+    const runtimeENV = (typeof this.loadOptions.env != "undefined")
+      ? this.loadOptions.env
+      : this.runtimeAPI.getRuntimeEnv();
     if (typeof runtimeENV == "undefined") return;
     const envRelatedFileName = this.runtimeAPI.scanDirForFile(
       runtimeENV,
