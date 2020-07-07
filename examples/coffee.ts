@@ -17,7 +17,12 @@ let dbPassword: number = coffee.get("database.password").number(); // DB_PASSWOR
 /* coffee can be reloaded config directory everywhere in the process,
  * all new configs will be replaced.
  */
-coffee.load({ configDir: "./custom" });
+coffee.load({
+  configDir: "./custom",
+  customEnvVarFileName: "cev",
+  env: "production",
+});
 
-let newDbName: string = coffee.get("database.name").string(); // my-new-db-name, loaded from .yml config file
-let newDbPassword: number = coffee.get("database.password").number(); // NEW_DB_PASSWORD, environment variable
+let newDbName: string = coffee.get("database.name").string(); // my-new-db-name, loaded from default.yml config file
+let newDbPassword: number = coffee.get("database.password").number(); // NEW_DB_PASSWORD, environment variable, loaded from cev.yml
+let dbLimitation: number = coffee.get("database.limitaion").number(); // 10, loaded from production.json
