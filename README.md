@@ -34,9 +34,15 @@ const name: string = coffee.get("person.name").string();
 const age: number = coffee.get("person.age").number();
 const passed: boolean = coffee.get("person.test.passed").boolean();
 ```
+_**NOTE**_
+
+coffee save raw, unkwnown type values in `value` property of result of `get` method.
+```ts
+const magical: unknown = coffee.get("person.superpower").boolean();
+```
 
 ## Has & Set
-check configuration is available on config files with set and set new configuration during runtume with `set`.
+check configuration is available on config files with `has` method and set new configuration during runtume with `set`.
 ```ts
 coffee.has("requests.limit"); // false
 coffee.set("requests.limit" , 100);
@@ -53,7 +59,11 @@ coffee can read the configurations from the desired directory.
 ```ts
 // coffee.ts
 import coffee from "https://deno.land/x/coffee/mod.ts";
-coffee.load({ configDir: "./custom" });
+coffee.load({ 
+   configDir: "./custom",       // specify the custom config directory
+   customEnvVarFileName: "cev", // specify the desired custom environment variable config file name
+   env: "production"            // force relative environment variables to loads from this env
+},);
 const dbName: string = coffee.get("database.name").string();
 ```
 
@@ -76,7 +86,7 @@ const name: string = coffee.get("database.name").string();
 ```
 
 ## Related Environment Variables
-coffe can read related environment variables from desired environment specified in `DENO_ENV` env.
+coffee can read related environment variables from desired environment specified in `DENO_ENV` env.
 ```json
 DENO_ENV=production
 
@@ -98,6 +108,8 @@ const name: string = coffee.get("something").string();
 ## Error Handling
 coffee tries to make a specific Error for each situation.
 ```ts
+import coffee, { errors } from "../mod.ts";
+
 try {
   coffee.load({ configDir: "./bad-config-dir" });
 } catch (e) {
@@ -108,7 +120,7 @@ try {
 }
 ```
 
-there are 4 kind of Error Classes that exported from coffee module:
+there are 4 kinds of Error Classes that exported from coffee module:
 
 `NoConfigDir` : throwed when no config dir available.
 
