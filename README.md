@@ -38,7 +38,7 @@ _**NOTE**_
 
 coffee saves raw, unkwnown type values in `value` property of result of `get` method.
 ```ts
-const magical: unknown = coffee.get("person.superpower").boolean();
+const magical: unknown = coffee.get("person.superpower").value;
 ```
 
 ## Has & Set
