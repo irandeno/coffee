@@ -6,7 +6,7 @@ import * as errors from "../../src/errors.ts";
 
 Deno.test("[errors] no config directory", function () {
   assertThrows(
-    () => coffee.load({ configDir: "./non-exists-dir" }),
+    () => coffee.load({ configDir: "./test/non-exists-dir" }),
     errors.NoConfigDir,
   );
 });
