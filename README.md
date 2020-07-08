@@ -49,27 +49,11 @@ coffee.set("requests.limit" , 100);
 coffee.has("requests.limit"); // true
 ```
 
-## Customize Coffee Load
-coffee can read the configurations from the desired directory.
-```
-- coffee.ts
-- custom
-  - default.json
-```
-```ts
-// coffee.ts
-import coffee from "https://deno.land/x/coffee/mod.ts";
-coffee.load({ 
-   configDir: "./custom", // specify the custom config directory
-   customEnvVarFileName: "cev", // specify the desired custom environment variable config file name
-   env: "production" // force relative environment variables to loads from this env
-},);
-const dbName: string = coffee.get("database.name").string();
-```
-
 ## Custom Environment Variables
 If you want to use environment variables, just create a file called `custom-environment-variable` and give it values that you want to read from environment variables.
 ```json
+ENV_NAME=coffee
+
 - coffee.ts
 - config
   - custom-environment-variables.json
@@ -82,7 +66,7 @@ If you want to use environment variables, just create a file called `custom-envi
 ```ts
 // coffee.ts
 import coffee from "https://deno.land/x/coffee/mod.ts";
-const name: string = coffee.get("database.name").string();
+const name: string = coffee.get("database.name").string(); // coffee, reads from ENV_NAME environment variable
 ```
 
 ## Related Environment Variables
@@ -103,6 +87,26 @@ DENO_ENV=production
 // coffee.ts
 import coffee from "https://deno.land/x/coffee/mod.ts";
 const name: string = coffee.get("something").string();
+```
+
+## Customize Coffee Load
+coffee can read the configurations from the desired directory.
+```
+- coffee.ts
+- custom
+  - default.json
+  - cev.json
+  - production.json
+```
+```ts
+// coffee.ts
+import coffee from "https://deno.land/x/coffee/mod.ts";
+coffee.load({ 
+   configDir: "./custom", // specify the custom config directory
+   customEnvVarFileName: "cev", // specify the desired custom environment variable config file name
+   env: "production" // force relative environment variables to loads from this env
+},);
+const dbName: string = coffee.get("database.name").string();
 ```
 
 ## Error Handling

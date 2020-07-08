@@ -1,4 +1,4 @@
-import coffee from "../mod.ts";
+import coffee from "https://deno.land/x/coffee/mod.ts";
 
 // if coffee.load() is not called, coffee automatically loads the configs from the './config' folder
 
