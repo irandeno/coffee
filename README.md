@@ -36,7 +36,7 @@ const passed: boolean = coffee.get("person.test.passed").boolean();
 ```
 _**NOTE**_
 
-coffee saves raw, unkwnown type values in `value` property of result of `get` method.
+coffee saves raw, unknown type values in `value` property of result of `get` method.
 ```ts
 const magical: unknown = coffee.get("person.superpower").value;
 ```
