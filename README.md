@@ -1,6 +1,9 @@
-![coffee](https://i.ibb.co/xHw5pkq/coffee.png)
 
-Type-safe, Easy To Use, <b>Deno Configuration</b>
+<div align="center">
+<img width="100%" alt="picker" src="https://i.ibb.co/xHw5pkq/coffee.png">
+<i>Type-safe, Easy To Use, <b>Deno Configuration</b>
+</i>
+</div>
 
 ## Getting Started
 Getting started with coffee is as easy as writing two lines of code ...
