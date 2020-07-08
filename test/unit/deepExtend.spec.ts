@@ -1,7 +1,7 @@
 import de from "../../src/deepExtend.ts";
 import { assertEquals } from "https://deno.land/std@0.58.0/testing/asserts.ts";
 
-Deno.test("should return a merged object", () => {
+Deno.test("[deepExtend] return a merged object", () => {
   const result = de({
     a: {
       b: 5,
@@ -48,7 +48,7 @@ Deno.test("should return a merged object", () => {
   });
 });
 
-Deno.test("should consider skipIfExist option and not overwrite the existing properties", () => {
+Deno.test("[deepExtend] consider skipIfExist option and not overwrite the existing properties", () => {
   const result = de({
     b: 5,
     c: 6,

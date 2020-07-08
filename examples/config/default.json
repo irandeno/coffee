@@ -1,0 +1,6 @@
+{
+  "database": {
+    "name": "my-db-name",
+    "user": "root"
+  }
+}
