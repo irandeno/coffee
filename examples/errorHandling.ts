@@ -1,4 +1,4 @@
-import coffee, { errors } from "../mod.ts";
+import coffee, { errors } from "https://deno.land/x/coffee/mod.ts";
 
 // No Config Dir :
 
