@@ -1,4 +1,4 @@
-import { parse, JSON_SCHEMA } from "https://deno.land/std/encoding/yaml.ts";
+import { ymlParse as parse, JSON_SCHEMA } from "./deps.ts";
 import { Configs } from "../mod.ts";
 
 export const ymlReader = (t: string): Configs =>
