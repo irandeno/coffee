@@ -1,4 +1,4 @@
-import { flagsParse } from "./src/deps.ts";
+import { argsParse } from "./src/deps.ts";
 import Validateable from "./src/Validateable.ts";
 import lensProp from "./src/lensProp.ts";
 import deepExtend from "./src/deepExtend.ts";
@@ -148,7 +148,7 @@ export class Coffee {
   }
 
   private loadProcessArgs() {
-    const processArgs = flagsParse(Deno.args);
+    const processArgs = argsParse(Deno.args);
     deepExtend(this.configs, processArgs.config);
   }
 

@@ -88,7 +88,7 @@ DENO_ENV=production
 import coffee from "https://deno.land/x/coffee/mod.ts";
 const name: string = coffee.get("something").string();
 ```
-## CommandLine Arguments
+## Command Line Arguments
 coffee can read forced configs from command line arguments.
 
 *note* for get config in coffee configurations we shoud prefix flags by "config".
