@@ -27,3 +27,10 @@ coffee.load({
 let newDbName: string = coffee.get("database.name").string(); // my-new-db-name, loaded from default.yml config file
 let newDbPassword: number = coffee.get("database.password").number(); // NEW_DB_PASSWORD, environment variable, loaded from cev.yml
 let dbLimitation: number = coffee.get("database.limitaion").number(); // 10, loaded from production.json
+
+/* coffee configurations can be forced and overwrited in command line arguments,
+ * as an example we can run : deno run --allow-read --allow-env coffee.ts --config.username=something
+ * note that for get config in coffee configurations we shoud prefix flags by "config".
+ */
+
+let username: number = coffee.get("username").number(); // something, readed from command line arguments

@@ -1,3 +1,4 @@
+import { argsParse } from "./src/deps.ts";
 import Validateable from "./src/Validateable.ts";
 import lensProp from "./src/lensProp.ts";
 import deepExtend from "./src/deepExtend.ts";
@@ -116,7 +117,7 @@ export class Coffee {
   }
 
   private loadEnvRelativeConfigs() {
-    const runtimeENV = (typeof this.loadOptions.env != "undefined")
+    const runtimeENV = typeof this.loadOptions.env != "undefined"
       ? this.loadOptions.env
       : this.runtimeAPI.getRuntimeEnv();
     if (typeof runtimeENV == "undefined") return;
@@ -146,6 +147,11 @@ export class Coffee {
     deepExtend(this.configs, customEnvVars);
   }
 
+  private loadProcessArgs() {
+    const processArgs = argsParse(Deno.args);
+    deepExtend(this.configs, processArgs.config);
+  }
+
   load(opts: Partial<LoadOptions> = {}): void {
     this.loadOptions = deepExtend(defaultOptions, opts);
     const dirEntries = this.runtimeAPI.readDirEntries(
@@ -159,6 +165,7 @@ export class Coffee {
     this.loadConfigs();
     this.loadEnvRelativeConfigs();
     this.loadCustomEnvVarConfigs();
+    this.loadProcessArgs();
     this.isLoaded = true;
   }
 
